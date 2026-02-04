@@ -46,6 +46,15 @@ public class TradingService {
         // Débit
         restTemplate.postForEntity("http://localhost:8082/api/wallets/" + buyerId + "/debit?amount=" + amount, null, Void.class);
 
+        Long sellerId = offer.getSellerId();
+        String creditUrl = "http://localhost:8082/api/wallets/" + sellerId + "/credit?amount=" + amount;
+
+        try {
+            restTemplate.postForEntity(creditUrl, null, Void.class);
+        } catch (Exception e) {
+            restTemplate.postForEntity("http://localhost:8082/api/wallets/" + buyerId + "/credit?amount=" + amount, null, Void.class);
+            throw new RuntimeException("Erreur lors du paiement du vendeur : " + e.getMessage());
+        }
         // 4. Création de l'enchère (Bid)
         Bid bid = Bid.builder()
                 .offerId(offerId)
