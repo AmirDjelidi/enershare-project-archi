@@ -17,13 +17,13 @@ public class Bid {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long buyerId;   // Qui achète (ID du Household)
+    private Long buyerId;
 
-    private Long offerId;   // Quelle offre est visée
+    private Long offerId;
 
-    private Double amount;  // Montant proposé (en €)
+    private Double amount;
 
-    private LocalDateTime timestamp; // Heure de l'enchère
+    private LocalDateTime timestamp;
 
     @Enumerated(EnumType.STRING)
     private BidStatus status;
