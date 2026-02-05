@@ -24,7 +24,7 @@ public class WalletService {
                 .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
         if (wallet.getBalance() < amount) {
-            throw new RuntimeException("Solde insuffisant pour effectuer la transaction");
+            throw new RuntimeException("Insufficient balance!");
         }
 
         wallet.setBalance(wallet.getBalance() - amount);
@@ -34,7 +34,7 @@ public class WalletService {
     @Transactional
     public void creditWallet(Long userId, Double amount) {
         Wallet wallet = walletRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Portefeuille introuvable"));
+                .orElseThrow(() -> new RuntimeException("Wallet not found"));
 
         wallet.setBalance(wallet.getBalance() + amount);
         walletRepository.save(wallet);

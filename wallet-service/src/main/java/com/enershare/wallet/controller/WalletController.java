@@ -8,21 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/wallets")
+@RequestMapping("/api/wallet")
 @RequiredArgsConstructor
 public class WalletController {
 
     private final WalletService walletService;
     private final WalletRepository walletRepository;
-
-    // Endpoint pour consulter le solde
-
     @GetMapping("/{userId}/balance")
     public ResponseEntity<Double> getBalance(@PathVariable Long userId) {
         return ResponseEntity.ok(walletService.getBalance(userId));
     }
 
-    @PostMapping("/{userId}/wallet")
+    @PostMapping("/{userId}/newWallet")
     public ResponseEntity<Wallet> createWallet(@PathVariable("userId")Long userId){
         Wallet wallet = Wallet.builder().
                 userId(userId).
@@ -30,10 +27,7 @@ public class WalletController {
                 build();
         return ResponseEntity.ok(walletRepository.save(wallet));
     }
-
-    // Endpoint pour débiter (utilisé par le Trading lors d'un achat)
-    // URL: POST http://localhost:8082/api/wallets/{userId}/debit?amount=10.0
-    @PostMapping("/{userId}/debit")
+    @PostMapping("/{userId}/withdraw")
     public ResponseEntity<Void> debit(
             @PathVariable("userId") Long userId,
             @RequestParam("amount") Double amount) {
@@ -41,9 +35,7 @@ public class WalletController {
         walletService.debitWallet(userId, amount);
         return ResponseEntity.ok().build();
     }
-
-    // Endpoint pour créditer (utile pour recharger son compte ou recevoir l'argent d'une vente)
-    @PostMapping("/{userId}/credit")
+    @PostMapping("/{userId}/addFunds")
     public ResponseEntity<Void> credit(@PathVariable Long userId, @RequestParam Double amount) {
         walletService.creditWallet(userId, amount);
         return ResponseEntity.ok().build();
