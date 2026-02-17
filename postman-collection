@@ -1,0 +1,284 @@
+{
+  "info": {
+    "name": "EnerShare - Full E2E Architecture Tests",
+    "description": "Comprehensive test suite for the EnerShare Microservices Architecture. Includes all edge cases, validations, and cross-service communications.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. User Service (Port 8085)",
+      "item": [
+        {
+          "name": "1.1 Register Alice (Seller)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:8085/api/auth/register", "protocol": "http", "host": ["localhost"], "port": "8085", "path": ["api", "auth", "register"]},
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"Alice\",\n  \"password\": \"password123\"\n}"}
+          }
+        },
+        {
+          "name": "1.2 Register Bob (Buyer)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:8085/api/auth/register", "protocol": "http", "host": ["localhost"], "port": "8085", "path": ["api", "auth", "register"]},
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"Bob\",\n  \"password\": \"password123\"\n}"}
+          }
+        },
+        {
+          "name": "1.3 Login Alice (Get JWT Token)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:8085/api/auth/login", "protocol": "http", "host": ["localhost"], "port": "8085", "path": ["api", "auth", "login"]},
+            "body": {"mode": "raw", "raw": "{\n  \"username\": \"Alice\",\n  \"password\": \"password123\"\n}"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Household Service (Port 8081)",
+      "item": [
+        {
+          "name": "2.1 Create Household Alice",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:8081/households", "protocol": "http", "host": ["localhost"], "port": "8081", "path": ["households"]},
+            "body": {"mode": "raw", "raw": "{\n  \"ownerName\": \"Alice\",\n  \"address\": \"10 Solar Street\"\n}"}
+          }
+        },
+        {
+          "name": "2.2 Create Household Bob",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:8081/households", "protocol": "http", "host": ["localhost"], "port": "8081", "path": ["households"]},
+            "body": {"mode": "raw", "raw": "{\n  \"ownerName\": \"Bob\",\n  \"address\": \"25 Moon Avenue\"\n}"}
+          }
+        },
+        {
+          "name": "2.3 Get All Households",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8081/households", "protocol": "http", "host": ["localhost"], "port": "8081", "path": ["households"]}
+          }
+        },
+        {
+          "name": "2.4 Update Meter Alice (Produce 50 kWh)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:8081/households/1/meter", "protocol": "http", "host": ["localhost"], "port": "8081", "path": ["households", "1", "meter"]},
+            "body": {"mode": "raw", "raw": "{\n  \"produced\": 50.0,\n  \"consumed\": 0.0\n}"}
+          }
+        },
+        {
+          "name": "2.5 Update Meter Bob (Consume 10 kWh)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": {"raw": "http://localhost:8081/households/2/meter", "protocol": "http", "host": ["localhost"], "port": "8081", "path": ["households", "2", "meter"]},
+            "body": {"mode": "raw", "raw": "{\n  \"produced\": 0.0,\n  \"consumed\": 10.0\n}"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Wallet Service (Port 8082)",
+      "item": [
+        {
+          "name": "3.1 Check Alice Balance (Should be 0)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8082/api/wallet/1/balance", "protocol": "http", "host": ["localhost"], "port": "8082", "path": ["api", "wallet", "1", "balance"]}
+          }
+        },
+        {
+          "name": "3.2 Add Funds to Bob (100€)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/wallet/2/addFunds?amount=100.0",
+              "protocol": "http", "host": ["localhost"], "port": "8082",
+              "path": ["api", "wallet", "2", "addFunds"],
+              "query": [{"key": "amount", "value": "100.0"}]
+            }
+          }
+        },
+        {
+          "name": "3.3 Withdraw Funds from Bob (Test - 10€)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/wallet/2/withdraw?amount=10.0",
+              "protocol": "http", "host": ["localhost"], "port": "8082",
+              "path": ["api", "wallet", "2", "withdraw"],
+              "query": [{"key": "amount", "value": "10.0"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Trading Service (Port 8083)",
+      "item": [
+        {
+          "name": "4.1 Open Trading Session",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {"raw": "http://localhost:8083/tradingSessions/", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["tradingSessions", ""]}
+          }
+        },
+        {
+          "name": "4.2 Get Active Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8083/tradingSessions/active", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["tradingSessions", "active"]}
+          }
+        },
+        {
+          "name": "4.3 FAILURE TEST: Sell 100 kWh (Exceeds Alice's 50 kWh)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/tradingSessions/1/offer?sellerId=1&name=FraudulentOffer&energyAmount=100.0&pricePerKwh=2.0",
+              "protocol": "http", "host": ["localhost"], "port": "8083",
+              "path": ["tradingSessions", "1", "offer"],
+              "query": [
+                {"key": "sellerId", "value": "1"},
+                {"key": "name", "value": "FraudulentOffer"},
+                {"key": "energyAmount", "value": "100.0"},
+                {"key": "pricePerKwh", "value": "2.0"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.4 SUCCESS TEST: Alice Sells 20 kWh at 2€ (Total: 40€)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/tradingSessions/1/offer?sellerId=1&name=GreenEnergy&energyAmount=20.0&pricePerKwh=2.0",
+              "protocol": "http", "host": ["localhost"], "port": "8083",
+              "path": ["tradingSessions", "1", "offer"],
+              "query": [
+                {"key": "sellerId", "value": "1"},
+                {"key": "name", "value": "GreenEnergy"},
+                {"key": "energyAmount", "value": "20.0"},
+                {"key": "pricePerKwh", "value": "2.0"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.5 Bob Buys Alice's Offer",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/tradingSessions/1/bid?offerId=1&buyerId=2",
+              "protocol": "http", "host": ["localhost"], "port": "8083",
+              "path": ["tradingSessions", "1", "bid"],
+              "query": [
+                {"key": "offerId", "value": "1"},
+                {"key": "buyerId", "value": "2"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.6 Check Bids History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8083/tradingSessions/api/bids/history", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["tradingSessions", "api", "bids", "history"]}
+          }
+        },
+        {
+          "name": "4.7 Close Trading Session",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {"raw": "http://localhost:8083/tradingSessions/1/close", "protocol": "http", "host": ["localhost"], "port": "8083", "path": ["tradingSessions", "1", "close"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Notification Service (Port 8084)",
+      "item": [
+        {
+          "name": "5.1 Get Alice's Inbox",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8084/api/notifications/1", "protocol": "http", "host": ["localhost"], "port": "8084", "path": ["api", "notifications", "1"]}
+          }
+        },
+        {
+          "name": "5.2 Get Bob's Inbox",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8084/api/notifications/2", "protocol": "http", "host": ["localhost"], "port": "8084", "path": ["api", "notifications", "2"]}
+          }
+        },
+        {
+          "name": "5.3 Mark Alice's Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {"raw": "http://localhost:8084/api/notifications/1/read", "protocol": "http", "host": ["localhost"], "port": "8084", "path": ["api", "notifications", "1", "read"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Final Assertions (The Ultimate Check)",
+      "item": [
+        {
+          "name": "6.1 Check Alice Final Balance (Expected: 40€)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8082/api/wallet/1/balance", "protocol": "http", "host": ["localhost"], "port": "8082", "path": ["api", "wallet", "1", "balance"]}
+          }
+        },
+        {
+          "name": "6.2 Check Bob Final Balance (Expected: 50€)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8082/api/wallet/2/balance", "protocol": "http", "host": ["localhost"], "port": "8082", "path": ["api", "wallet", "2", "balance"]}
+          }
+        },
+        {
+          "name": "6.3 Check Alice Final Energy (Expected: 30 kWh)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8081/households/1", "protocol": "http", "host": ["localhost"], "port": "8081", "path": ["households", "1"]}
+          }
+        },
+        {
+          "name": "6.4 Check Bob Final Energy (Expected: 20 kWh)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:8081/households/2", "protocol": "http", "host": ["localhost"], "port": "8081", "path": ["households", "2"]}
+          }
+        }
+      ]
+    }
+  ]
+}
