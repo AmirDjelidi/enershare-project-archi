@@ -39,7 +39,6 @@ public class TradingService {
             restTemplate.postForEntity("http://localhost:8082/api/wallet/" + buyerId + "/addFunds?amount=" + amount, null, Void.class);
             throw new RuntimeException("Error during seller payment: " + e.getMessage());
         }
-        // 4. Creation of the bid
         Bid bid = Bid.builder()
                 .offerId(offerId)
                 .buyerId(buyerId)
@@ -47,7 +46,6 @@ public class TradingService {
                 .timestamp(LocalDateTime.now())
                 .status(BidStatus.ACCEPTED)
                 .build();
-        // 5. Remove of the offer in the trading session
         session.getOffers().remove(offerToBuy);
         if (session.getOffers().isEmpty()) {
             session.setStatus(SessionStatus.CLOSED);
@@ -55,6 +53,35 @@ public class TradingService {
         }
         tradingSessionRepository.save(session);
         offerToBuy.setTradingSession(null);
-        return bidRepository.save(bid);
+
+
+        Bid savedBid = bidRepository.save(bid);
+        try {
+            String notifUrl = "http://localhost:8084/api/notifications?userId={userId}&message={message}";
+            
+            
+            String sellerMsg = String.format("Congratulations! Your ‘%s’ energy has been purchased. %s€ has been added to your wallet.", offerToBuy.getName(), amount);
+            restTemplate.postForEntity(notifUrl, null, Void.class, sellerId, sellerMsg);
+            
+            
+            String buyerMsg = String.format("Achat réussi ! Vous avez acquis '%s' pour %s€.", offerToBuy.getName(), amount);
+            restTemplate.postForEntity(notifUrl, null, Void.class, buyerId, buyerMsg);
+            
+        } catch (Exception e) {
+        
+            System.err.println("Warning: Unable to send notifications. " + e.getMessage());
+        }
+
+        try {
+            Double energyTraded = offerToBuy.getEnergyAmount();
+            
+            restTemplate.put("http://localhost:8081/households/" + sellerId + "/deductEnergy?amount=" + energyTraded, null);
+            restTemplate.put("http://localhost:8081/households/" + buyerId + "/addEnergy?amount=" + energyTraded, null);
+            
+        } catch (Exception e) {
+            System.err.println("Warning: Unable to update energy meters. " + e.getMessage());
+        }
+
+        return savedBid;
     }
 }

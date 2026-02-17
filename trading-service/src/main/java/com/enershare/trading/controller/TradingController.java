@@ -8,10 +8,13 @@ import com.enershare.trading.repository.BidRepository;
 import com.enershare.trading.repository.TradingSessionRepository;
 import com.enershare.trading.service.TradingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/tradingSessions")
@@ -21,6 +24,9 @@ public class TradingController {
     private final TradingService tradingService;
     private final TradingSessionRepository tradingSessionRepository;
     private final BidRepository bidRepository;
+    
+    private final RestTemplate restTemplate; 
+
     @GetMapping("/active")
     public ResponseEntity<List<TradingSession>> getActiveOffers() {
         return ResponseEntity.ok(tradingSessionRepository.findByStatus(SessionStatus.ACTIVE));
@@ -41,7 +47,7 @@ public class TradingController {
 
     @PostMapping("/{id}/close")
     public ResponseEntity<TradingSession> closeTradingSession(
-            @RequestParam Long sessionId){
+            @PathVariable("id") Long sessionId){ 
         TradingSession tradingSession = tradingSessionRepository.findById(sessionId)
                         .orElseThrow(() -> new RuntimeException("Session not found"));
         tradingSession.setStatus(SessionStatus.CLOSED);
@@ -49,19 +55,40 @@ public class TradingController {
     }
 
     @PostMapping("/{id}/offer")
-    public ResponseEntity<TradingSession> createOffer (
-            @RequestParam Long sessionId,
+    public ResponseEntity<?> createOffer (
+            @PathVariable("id") Long sessionId, 
             @RequestParam Long sellerId,
             @RequestParam String name,
             @RequestParam Double energyAmount,
-            @RequestParam Double pricePerKwh
-            )
+            @RequestParam Double pricePerKwh)
     {
         TradingSession session = tradingSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
+                
         if (session.getStatus() == SessionStatus.CLOSED){
-            throw new RuntimeException("The session is closed");
+            return ResponseEntity.badRequest().body("The session is closed");
         }
+
+        try {
+            String householdUrl = "http://localhost:8081/households/" + sellerId;
+            Map<String, Object> household = restTemplate.getForObject(householdUrl, Map.class);
+            
+            if (household != null) {
+                Number producedEnergyNum = (Number) household.get("producedEnergy"); 
+                
+                Double producedEnergy = producedEnergyNum != null ? producedEnergyNum.doubleValue() : 0.0;
+                
+                if (producedEnergy < energyAmount) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Erreur : Le foyer N°" + sellerId + " n'a pas produit assez d'énergie ! " +
+                              "(Stock actuel: " + producedEnergy + " kWh | Tentative de vente: " + energyAmount + " kWh).");
+                }
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Erreur : Impossible de contacter le compteur intelligent du foyer N°" + sellerId);
+        }
+        
         Offer createdOffer = Offer
                 .builder()
                 .sellerId(sellerId)
@@ -70,19 +97,21 @@ public class TradingController {
                 .energyAmount(energyAmount)
                 .pricePerKwh(pricePerKwh)
                 .build();
+                
         List<Offer> offers = session.getOffers();
         offers.add(createdOffer);
         session.setOffers(offers);
+        
         return ResponseEntity.ok(tradingSessionRepository.save(session));
     }
 
     @PostMapping("/{id}/bid")
     public ResponseEntity<Bid> placeBid(
-            @RequestParam Long sessionId,
+            @PathVariable("id") Long sessionId,
             @RequestParam Long offerId,
             @RequestParam Long buyerId) {
 
-        Bid createdBid = tradingService.placeBid(sessionId,offerId, buyerId);
+        Bid createdBid = tradingService.placeBid(sessionId, offerId, buyerId);
         return ResponseEntity.ok(createdBid);
     }
 }

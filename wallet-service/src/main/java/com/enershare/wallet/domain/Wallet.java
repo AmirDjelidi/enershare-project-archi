@@ -1,6 +1,6 @@
 package com.enershare.wallet.domain;
 
-import jakarta.persistence.*; // BIEN UTILISER JAKARTA
+import jakarta.persistence.*; 
 import lombok.*;
 import java.util.Objects;
 

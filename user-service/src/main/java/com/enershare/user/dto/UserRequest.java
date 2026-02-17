@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.Set;
 
+
 public class UserRequest {
     @NotBlank(message = "Username is required")
     private String username;

@@ -20,7 +20,6 @@ public class Household {
     @Column(nullable = false)
     private String address;
 
-    // Smart Meter Data [cite: 15, 26]
     @Builder.Default
     private Double producedEnergy = 0.0; 
     

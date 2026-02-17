@@ -39,5 +39,15 @@ public class HouseholdController {
     public ResponseEntity<List<Household>> getAll() {
         return ResponseEntity.ok(householdService.getAllHouseholds());
     }
+
+    @PutMapping("/{id}/deductEnergy")
+    public ResponseEntity<Household> deductEnergy(@PathVariable Long id, @RequestParam Double amount) {
+        return ResponseEntity.ok(householdService.deductEnergy(id, amount));
+    }
+
+    @PutMapping("/{id}/addEnergy")
+    public ResponseEntity<Household> addEnergy(@PathVariable Long id, @RequestParam Double amount) {
+        return ResponseEntity.ok(householdService.addEnergy(id, amount));
+    }
     
 }

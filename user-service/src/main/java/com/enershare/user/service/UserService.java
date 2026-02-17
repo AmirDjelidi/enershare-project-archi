@@ -26,8 +26,6 @@ public class UserService {
         User user = new User();
         user.setUsername(userRequest.getUsername());
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        // Assume roles are passed as Set<String> and mapped to Role entities elsewhere
-        // For simplicity, not handling roles mapping here
         return userRepository.save(user);
     }
 
@@ -37,8 +35,6 @@ public class UserService {
         if (userRequest.getPassword() != null && !userRequest.getPassword().isEmpty()) {
             u.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         }
-        // Assume roles are passed as Set<String> and mapped to Role entities elsewhere
-        // For simplicity, not handling roles mapping here
         return userRepository.save(u);
     }
 

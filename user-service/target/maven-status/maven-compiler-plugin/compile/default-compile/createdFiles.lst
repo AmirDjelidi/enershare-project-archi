@@ -1,6 +1,7 @@
 com\enershare\user\model\Role.class
 com\enershare\user\DataInitializer.class
 com\enershare\user\model\User.class
+com\enershare\user\security\JwtAuthFilter.class
 com\enershare\user\repository\UserRepository.class
 com\enershare\user\service\UserService.class
 com\enershare\user\UserServiceApplication.class

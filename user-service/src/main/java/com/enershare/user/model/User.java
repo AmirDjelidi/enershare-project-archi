@@ -5,6 +5,7 @@ import java.util.Set;
 import com.enershare.user.model.Role;
 
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

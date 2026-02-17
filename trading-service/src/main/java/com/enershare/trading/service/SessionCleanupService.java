@@ -17,7 +17,7 @@ import java.util.List;
 public class SessionCleanupService {
     private final TradingSessionRepository tradingSessionRepository;
     @Transactional
-    @Scheduled(fixedRate = 600000) //close all trading sessions where created 1 hour ago
+    @Scheduled(fixedRate = 600000) 
     public void closeExpiredSession(){
         LocalDateTime threshold = LocalDateTime.now();
         List<TradingSession> sessions = tradingSessionRepository.findByStatus(SessionStatus.ACTIVE);

@@ -1,7 +1,7 @@
 package com.enershare.trading.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*; // BIEN UTILISER JAKARTA
+import jakarta.persistence.*; 
 import lombok.*;
 import java.util.Objects;
 

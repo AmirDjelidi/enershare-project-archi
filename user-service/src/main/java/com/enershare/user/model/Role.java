@@ -3,6 +3,7 @@ package com.enershare.user.model;
 import jakarta.persistence.*;
 import java.util.Set;
 import com.enershare.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Role {
@@ -11,6 +12,7 @@ public class Role {
     private Long id;
     private String name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "roles")
     private Set<User> users;
 

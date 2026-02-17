@@ -19,20 +19,18 @@ public class HouseholdService {
 
     @Transactional
     public Household createHousehold(HouseholdReq req) {
-        // 1. Sauvegarde le foyer en BDD [cite: 25]
         Household household = Household.builder()
                 .ownerName(req.getOwnerName())
                 .address(req.getAddress())
                 .build();
         Household savedHousehold = repository.save(household);
 
-        // 2. Appelle le Wallet-Service pour lui créer un portefeuille [cite: 16, 60]
         try {
             String walletUrl = "http://localhost:8082/api/wallet/" + savedHousehold.getId() + "/newWallet";
             restTemplate.postForEntity(walletUrl, null, Void.class);
-            System.out.println("Wallet créé avec succès pour le user " + savedHousehold.getId());
+            System.out.println("Wallet successfully created for the user " + savedHousehold.getId());
         } catch (Exception e) {
-            System.err.println("Erreur de création de Wallet: " + e.getMessage());
+            System.err.println("Wallet creation error: " + e.getMessage());
         }
 
         return savedHousehold;
@@ -40,7 +38,7 @@ public class HouseholdService {
 
     public Household getHousehold(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Foyer non trouvé"));
+                .orElseThrow(() -> new RuntimeException("Home not found"));
     }
 
     public List<Household> getAllHouseholds() {
@@ -49,9 +47,8 @@ public class HouseholdService {
 
     @Transactional
     public Household updateEnergy(Long id, Double produced, Double consumed) {
-        Household household = getHousehold(id); // Récupère le foyer (ou lance une erreur s'il n'existe pas)
+        Household household = getHousehold(id); 
         
-        // Ajoute la nouvelle énergie aux compteurs existants
         if (produced != null) {
             household.setProducedEnergy(household.getProducedEnergy() + produced);
         }
@@ -59,6 +56,23 @@ public class HouseholdService {
             household.setConsumedEnergy(household.getConsumedEnergy() + consumed);
         }
         
+        return repository.save(household);
+    }
+
+    @Transactional
+    public Household deductEnergy(Long id, Double amount) {
+        Household household = getHousehold(id);
+        if (household.getProducedEnergy() < amount) {
+            throw new RuntimeException("Not enough energy in reserve!");
+        }
+        household.setProducedEnergy(household.getProducedEnergy() - amount);
+        return repository.save(household);
+    }
+
+    @Transactional
+    public Household addEnergy(Long id, Double amount) {
+        Household household = getHousehold(id);
+        household.setProducedEnergy(household.getProducedEnergy() + amount);
         return repository.save(household);
     }
 }
