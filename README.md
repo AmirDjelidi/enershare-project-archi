@@ -15,6 +15,9 @@ The system is built using **Java 21** and **Spring Boot**, implementing a decent
 | 📈 **Trading Service** | `8083` | The core engine. Manages trading sessions, offers, and bids. Enforces business rules (e.g., checking energy/funds availability). |
 | 🔔 **Notification Service**| `8084` | Acts as an inbox, alerting users about successful trades and wallet updates. |
 
+<img width="1061" height="597" alt="RLHTJzim57tthxWA4YiIpKO1YUrXeWqVsxGFHCfusOjnBgbLn-xyCLPD--zpSab8iu1KnRdd79zpQlVSUMvzg1HpQwattF8AXAasHgFskTygX3YSzQOBBjQbDK4NcL76mjxLs_gVCIzzH7-HmXg7zfSKw61knKfw53vOX2bSQhJvYbjaZ0iVoKccPDm8NaF-nCiIxGyzcQj8FOI5UJY4UL" src="https://github.com/user-attachments/assets/ee4766d7-25b0-46eb-8807-bbdd64dc349e" />
+
+
 ## 🚀 Prerequisites
 
 To run this project locally, you need:
