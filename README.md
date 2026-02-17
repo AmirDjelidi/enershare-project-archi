@@ -81,7 +81,7 @@ We have prepared a complete End-to-End (E2E) testing suite that simulates a full
 
 * Click on Import.
 
-* Copy the raw JSON of the EnerShare - Full E2E Architecture Tests collection and paste it into the "Raw text" tab. [Available Here](https://github.com/AmirDjelidi/EnerShare-project-archi/blob/main/postman-collection.json])
+* Copy the raw JSON of the EnerShare - Full E2E Architecture Tests collection and paste it into the "Raw text" tab. [Available Here](https://github.com/AmirDjelidi/EnerShare-project-archi/blob/main/postman-collection.json)
 
 * Run the requests in order (from 1 to 14) to see the magic happen!
 
